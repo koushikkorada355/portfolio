@@ -157,13 +157,15 @@ function parseSubmissionCalendar(value: unknown): SubmissionCalendar {
 
 async function refreshGfg(): Promise<LiveStats["gfg"] | null> {
   const urls = [
+    "/api/gfg",
     GFG_PROFILE_URL,
     `https://api.allorigins.win/raw?url=${encodeURIComponent(GFG_PROFILE_URL)}`,
   ];
   let lastError: unknown;
   for (const url of urls) {
     try {
-      return parseGfgStats(await fetchText(url));
+      const response = await fetchText(url);
+      return url === "/api/gfg" ? (JSON.parse(response) as LiveStats["gfg"]) : parseGfgStats(response);
     } catch (error) {
       lastError = error;
       // Try the next source; profile pages often reject browser-origin requests.
